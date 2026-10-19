@@ -38,6 +38,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .pop{animation:pop .4s}@keyframes pop{from{transform:rotateY(90deg)}}
 .fly-up{transform:translateY(-70vh) scale(.5);opacity:0}.fly-down{transform:translateY(70vh) scale(.5);opacity:0}
 .win{outline:3px solid var(--ok)}
+#fin button.sec{background:transparent;border:1px solid #fffa}
 #aviso{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;background:#c0392b;color:#fff;text-align:center;padding:8px;display:none;z-index:200}
 #est{min-height:22px;user-select:text;-webkit-user-select:text;font-size:14px;max-width:90vw;word-break:break-all}.code{font-size:34px;letter-spacing:.2em;font-weight:800;display:block}.o{font-size:12px;opacity:.7}
 .zona.enfuego{border:2px solid #ff8c00;box-shadow:0 0 9px #ff8c0066}
@@ -329,7 +330,7 @@ function datosEjemplo(){const r=M.crearRng(42),R=()=>3+Math.floor(r()*8);
  const eventos={};Object.keys(M.EVENTOS_COMUNES).forEach(t=>eventos[t]=8);
  return{colores:col,cartas,eventos}}
 function cargar(d){D=M.cargarDatos(d);$('#cnt').textContent='Cartas cargadas: '+D.cartas.length;nueva()}
-function nueva(){P=M.crearPartida(D);phase='elegir';sel=[];last=null;prev=[];evKey=-1;racha=[0,0];rachaVis=[0,0];$('#fin').style.display='none';render();sincro()}
+function nueva(){P=M.crearPartida(D);phase='elegir';sel=[];last=null;prev=[];evKey=-1;racha=[0,0];rachaVis=[0,0];$('#fin').style.display='none';rv=[false,false];finF=null;render();sincro()}
 const evActual=()=>phase==='revelado'?last.evento:M.eventoActual(P);
 const K=()=>M.cantidadAJugar(evActual());
 function cardEl(c,opts={}){const e=document.createElement('div');e.className='card';e.dataset.id=c.id;
@@ -339,7 +340,10 @@ function cardEl(c,opts={}){const e=document.createElement('div');e.className='ca
  e.innerHTML=`<div class="tot">${c.total}</div><div class="cargo">${c.cargo}</div><div class="foto"><span>${c.nombre[0]}</span>${c.foto?`<img src="${c.foto}" onerror="this.remove()">`:''}<div class="ov"><div class="nom">${c.nombre}</div><div class="afs">${c.afiliaciones.join(' · ')}</div></div></div><div class="at">${M.ATRIBUTOS.map(a=>`<i class="${rel.includes(a)?'rel':''}">${a.slice(0,3).toUpperCase()} <b>${c[a]}</b></i>`).join('')}</div>`;
  return e}
 let tm=[];const T=(f,ms)=>tm.push(setTimeout(f,ms));
-function render(){tm.forEach(clearTimeout);tm=[];
+let revKey=null;
+function render(){const rk=phase==='revelado'?P.seed+'-'+last.turno:null;
+ if(rk&&rk===revKey){[['n0',N[0]],['n1',N[1]],['zv',N[0]],['zr',N[1]]].forEach(([i,v])=>$('#'+i).textContent=v);return}
+ revKey=rk;tm.forEach(clearTimeout);tm=[];
  const t=phase==='revelado'?last.turno+1:P.turno+1;if(phase!=='revelado'){pz=[P.pozos[0].length,P.pozos[1].length];rachaVis=racha.slice()}
  $('#t').textContent=`${t}/${P.eventos.length}`;$('#mz').textContent=P.mazo.length;$('#p0').textContent=pz[0];$('#p1').textContent=pz[1];
  $('#rival').innerHTML='<span style="font-size:11px;color:var(--mut);margin-right:6px">'+esc(N[1])+'</span>'+'<div class="mini"></div>'.repeat(P.manos[1].length);
@@ -352,7 +356,7 @@ function render(){tm.forEach(clearTimeout);tm=[];
  if(phase!=='revelado'){
   if(rivJugo())for(let i=0;i<k;i++)riv.append(cardEl({id:'x'},{down:true}));
   sel.forEach(id=>{const e=cardEl(P.cartas[id]);e.onclick=()=>{if(phase!=='elegir')return;sel=sel.filter(x=>x!==id);render()};mia.append(e)});
-  if(phase==='espera')msg.textContent='Esperando a '+N[1]+'…';else if(sel.length===k){const b=document.createElement('button');b.textContent='Jugar';b.onclick=confirmar;msg.append(b)}else msg.textContent=k===1?'Arrastrá una carta a la mesa (o tocala)':`Elegí ${k} cartas (arrastrá o tocá)`;
+  if(phase==='espera')msg.textContent='Esperando a '+N[1]+'…';else if(sel.length===k){const b=document.createElement('button');b.textContent='Jugar';b.onclick=confirmar;msg.append(b)}else msg.textContent=k===1?'Arrastrá una carta a la mesa (o tocala) y apretá Jugar':`Elegí ${k} cartas (arrastrá o tocá) y apretá Jugar`;
  }else{
   last.jugadas[0].forEach(id=>mia.append(cardEl(P.cartas[id])));
   const rc=last.jugadas[1].map(id=>{const e=cardEl(P.cartas[id],{down:true});riv.append(e);return[e,id]});
@@ -375,7 +379,7 @@ function arrastrable(e,id){
   e.onpointerup=u=>{e.onpointermove=e.onpointerup=e.onpointercancel=null;$('#mia').classList.remove('hover');
    if(!mv||inside(u.clientX,u.clientY))agregar(id,mv);else{e.style.transition='';e.style.transform='';e.style.zIndex=''}};
   e.onpointercancel=()=>{e.style.transition='';e.style.transform='';e.style.zIndex=''}}}
-function agregar(id,drop){const k=K();if(sel.length>=k){if(k===1)sel=[];else return}sel.push(id);render();if(drop&&k===1&&sel.length===1)confirmar()}
+function agregar(id,drop){const k=K();if(sel.length>=k){if(k===1)sel=[];else return}sel.push(id);render()}
 function botElige(){const ev=M.eventoActual(P),h=P.manos[1].map(i=>P.cartas[i]),k=M.cantidadAJugar(ev),rel=M.EVENTOS_COMUNES[ev];
  if(k===1)return[h.map(c=>[rel.reduce((s,a)=>s+c[a],0)+c.total/100+Math.random()*3,c]).sort((a,b)=>b[0]-a[0])[0][1].id];
  let best=null;for(let i=0;i<h.length;i++)for(let j=i+1;j<h.length;j++){const s=h[i].total+h[j].total-(h[i].afiliaciones.some(x=>h[j].afiliaciones.includes(x))?0:8)+Math.random()*4;if(!best||s>best[0])best=[s,[h[i].id,h[j].id]]}
@@ -383,9 +387,18 @@ function botElige(){const ev=M.eventoActual(P),h=P.manos[1].map(i=>P.cartas[i]),
 function siguiente(){const g=last.resultado.ganador;
  document.querySelectorAll('#mesa .card').forEach(c=>c.classList.add(g===0?'fly-down':g===1?'fly-up':(c.closest('#mia')?'fly-down':'fly-up')));
  setTimeout(()=>{phase=yoJugue()?'espera':'elegir';if(P.terminada){const f=M.resultadoFinal(P);final(f);pz=f.cartas.slice();$('#p0').textContent=pz[0];$('#p1').textContent=pz[1]}else render()},450)}
-function final(f){const g=f.ganador,[a,b]=f.cartas,fin=$('#fin');fin.className=g===0?'fw':g===1?'fl':'fe';
- fin.innerHTML=`<div style="font-size:64px">${g===0?'🏆':g===1?'💔':'🤝'}</div><div class="big">${g===0?'¡GANASTE!':g===1?'PERDISTE':'EMPATE'}</div><div class="score">${a} a ${b}</div><button onclick="otra()">Jugar de nuevo</button>`;
- fin.style.display='flex';if(g===0)for(let i=0;i<45;i++){const c=document.createElement('i');c.className='cf';c.style.cssText=`left:${Math.random()*100}%;background:hsl(${Math.random()*360},85%,60%);animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*1.5}s`;fin.append(c)}}
+let rv=[false,false],salio=false,finF=null;
+const repinta=()=>{if($('#fin').style.display==='flex')pintaFin()};
+function final(f){finF=f;pintaFin(true)}
+function pintaFin(nuevo){const fin=$('#fin'),nr=esc(N[1]),pant=(e,t,b)=>{fin.className='fe';fin.innerHTML=`<div style="font-size:56px">${e}</div><div class="sub" style="font-size:22px">${t}</div>${b}`;fin.style.display='flex'};
+ if(!finF){if(salio&&!(P&&P.terminada))pant('👋',nr+' salió de la sala','<button onclick="salir()">Volver al inicio</button>');return}
+ if(salio)return pant('👋',nr+' salió de la sala','<button onclick="salir()">Volver al inicio</button>');
+ if(rv[0])return pant('⏳','Esperando a '+nr+'…','<button class="sec" onclick="salir()">Salir de la sala</button>');
+ const g=finF.ganador,[a,b]=finF.cartas;fin.className=g===0?'fw':g===1?'fl':'fe';
+ fin.innerHTML=`<div style="font-size:64px">${g===0?'🏆':g===1?'💔':'🤝'}</div><div class="big">${g===0?'¡GANASTE!':g===1?'PERDISTE':'EMPATE'}</div><div class="score">${a} a ${b}</div><div class="sub">${rv[1]?nr+' quiere jugar de nuevo':''}</div><button onclick="otra()">Jugar de nuevo</button><button class="sec" onclick="salir()">${modo==='bot'?'Volver al inicio':'Salir de la sala'}</button>`;
+ fin.style.display='flex';if(nuevo&&g===0)for(let i=0;i<45;i++){const c=document.createElement('i');c.className='cf';c.style.cssText=`left:${Math.random()*100}%;background:hsl(${Math.random()*360},85%,60%);animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*1.5}s`;fin.append(c)}}
+function otra(){if(modo==='bot')return nueva();rv[0]=true;enviar({t:modo==='invitado'?'revancha':'rv'});if(modo==='anfitrion'&&rv[1])return nueva();pintaFin()}
+function salir(){enviar({t:'salir'});setTimeout(()=>{try{peer&&peer.destroy()}catch(e){}location.href=location.href.split('?')[0]},150)}
 try{$('#nom').value=localStorage.getItem('nombre')||''}catch(e){}
 const yoJugue=()=>modo==='invitado'?yjG:!!P.jugadas[0],rivJugo=()=>modo==='invitado'?rjG:!!P.jugadas[1];
 const est=t=>{$('#est').innerHTML=t},aviso=t=>{const a=$('#aviso');a.textContent=t;a.style.display='block';setTimeout(()=>a.style.display='none',6000)},enviar=m=>{if(conn&&conn.open)conn.send(m)};
@@ -395,37 +408,37 @@ function snap(j){const o=1-j,sw=a=>j===0?a:[a[1],a[0]],z=n=>Array(n).fill(0),ids
  const cartas={};ids.forEach(i=>cartas[i]=P.cartas[i]);
  return{colores:D.colores,N:sw(N),racha:sw(racha),yj:!!P.jugadas[j],rj:!!P.jugadas[o],last:l,partida:{seed:P.seed,cartas,eventos:P.eventos.map((e,i)=>i===P.turno?e:null),turno:P.turno,mazo:z(P.mazo.length),manos:[P.manos[j],z(P.manos[o].length)],pozos:[z(P.pozos[j].length),z(P.pozos[o].length)],terminada:P.terminada}}}
 function recibe(s){D={colores:s.colores};N=s.N;racha=s.racha;P=s.partida;yjG=s.yj;rjG=s.rj;
- if(P.seed!==seedG){seedG=P.seed;last=s.last;sel=[];prev=[];evKey=-1;rachaVis=[0,0];$('#fin').style.display='none';phase=s.last?'revelado':(yjG?'espera':'elegir')}
+ if(P.seed!==seedG){seedG=P.seed;last=s.last;sel=[];prev=[];evKey=-1;rachaVis=[0,0];rv=[false,false];finF=null;$('#fin').style.display='none';phase=s.last?'revelado':(yjG?'espera':'elegir')}
  else if(s.last&&(!last||last.turno!==s.last.turno)){last=s.last;sel=[];phase='revelado'}
  else if(phase!=='revelado')phase=yjG?'espera':'elegir';
  render()}
-function otra(){if(modo==='invitado')enviar({t:'otra'});else nueva()}
 function resuelto(reg){last=reg;{const g=reg.resultado.ganador;racha=[g===0?racha[0]+1:0,g===1?racha[1]+1:0]}sel=[];phase='revelado';render();sincro()}
 function confirmar(){if(sel.length!==K())return;const ids=sel.slice();
  if(modo==='invitado'){enviar({t:'jugada',ids});phase='espera';render();return}
  const r=M.jugar(P,0,ids);
  if(modo==='bot')return resuelto(M.jugar(P,1,botElige()).resultado);
  if(r.esperando){phase='espera';render();sincro()}else resuelto(r.resultado)}
-function empezar(){emp=true;$('#ini').style.display='none';nueva()}
+function empezar(){emp=true;if(modo==='anfitrion')$('#nv').textContent='Salir';$('#ini').style.display='none';nueva()}
 const nombre=()=>$('#nom').value.trim()||'Jugador',guarda=()=>{try{localStorage.setItem('nombre',nombre())}catch(e){}};
 function deInvitado(m){if(m.t==='hola'){N[1]=String(m.nombre||'Rival').slice(0,16);if(emp){render();sincro()}else empezar()}
  else if(m.t==='jugada'&&emp){let r;try{r=M.jugar(P,1,m.ids)}catch(e){return}if(r.esperando){render();sincro()}else resuelto(r.resultado)}
- else if(m.t==='otra'&&emp)nueva()}
+ else if(m.t==='revancha'&&emp){rv[1]=true;if(rv[0])nueva();else repinta()}
+ else if(m.t==='salir'){salio=true;pintaFin()}}
 function crearSala(){if(typeof Peer==='undefined')return est('No se pudo cargar PeerJS (hace falta internet).');
  const c=Math.random().toString(36).slice(2,6).toUpperCase();if(peer)peer.destroy();peer=new Peer('pa-'+c);
  peer.on('open',()=>est('Código de sala:<b class="code">'+c+'</b>Esperando al rival…<br>Enlace: '+location.href.split('?')[0]+'?sala='+c));
  peer.on('error',e=>{if(e.type==='unavailable-id')crearSala();else est('Error de conexión: '+e.type)});
- peer.on('connection',cn=>{conn=cn;cn.on('data',deInvitado);cn.on('close',()=>aviso(N[1]+' se desconectó. Puede volver a entrar con el mismo código.'))})}
+ peer.on('connection',cn=>{conn=cn;cn.on('data',deInvitado);cn.on('close',()=>!salio&&aviso(N[1]+' se desconectó. Puede volver a entrar con el mismo código.'))})}
 function unirse(){if(typeof Peer==='undefined')return est('No se pudo cargar PeerJS (hace falta internet).');
  const c=$('#cod').value.trim().toUpperCase();if(c.length<4)return est('Escribí el código de 4 letras.');
  est('Conectando…');peer=new Peer();peer.on('error',e=>est('No se pudo conectar: '+e.type+(e.type==='peer-unavailable'?' (revisá el código)':'')));
- peer.on('open',()=>{conn=peer.connect('pa-'+c,{reliable:true});conn.on('open',()=>{modo='invitado';$('#nv').style.display='none';conn.send({t:'hola',nombre:nombre()});est('Conectado. Esperando que empiece…')});
-  conn.on('data',m=>{if(m.t==='snap'){$('#ini').style.display='none';recibe(m.s)}});conn.on('close',()=>aviso('Se perdió la conexión con '+N[1]+'. Recargá la página y entrá de nuevo con el código.'))})}
+ peer.on('open',()=>{conn=peer.connect('pa-'+c,{reliable:true});conn.on('open',()=>{modo='invitado';$('#nv').textContent='Salir';conn.send({t:'hola',nombre:nombre()});est('Conectado. Esperando que empiece…')});
+  conn.on('data',m=>{if(m.t==='snap'){$('#ini').style.display='none';recibe(m.s)}else if(m.t==='rv'){rv[1]=true;repinta()}else if(m.t==='salir'){salio=true;pintaFin()}});conn.on('close',()=>!salio&&aviso('Se perdió la conexión con '+N[1]+'. Recargá la página y entrá de nuevo con el código.'))})}
 $('#go').onclick=()=>{modo='bot';N=[nombre(),'Bot'];guarda();empezar()};
 $('#crear').onclick=()=>{modo='anfitrion';N=[nombre(),'Rival'];guarda();crearSala()};
 $('#unir').onclick=()=>{guarda();unirse()};
 {const q=new URLSearchParams(location.search).get('sala');if(q)$('#cod').value=q.toUpperCase()}
-$('#nv').onclick=otra;
+$('#nv').onclick=()=>{if(modo==='bot')nueva();else if(confirm('¿Salir de la sala?'))salir()};
 function deXlsx(buf){const wb=XLSX.read(buf,{type:'array'}),g=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:''}),s=v=>String(v).trim();
  const colores={};g('Colores').forEach(r=>{if(s(r['Afiliación'])&&s(r['Color']))colores[s(r['Afiliación'])]=s(r['Color'])});
  const eventos={};g('Eventos').forEach(r=>{if(s(r['Tipo'])&&r['Cantidad']!=='')eventos[s(r['Tipo'])]=Number(r['Cantidad'])});
