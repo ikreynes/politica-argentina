@@ -3,10 +3,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Política Argentina</title>
 <style>
-:root{--bg:#f4f1ea;--fg:#222;--mut:#6b6b6b;--pnl:#e9e4d8;--acc:#2b5fd9;--ok:#1f8a4c;--ko:#c0392b;--cw:min(28vw,150px,16.5vh);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f4f1ea;--fg:#222;--mut:#6b6b6b;--pnl:#e9e4d8;--acc:#2b5fd9;--ok:#1f8a4c;--ko:#c0392b;--cw:max(72px,min(29vw,190px,calc((100vh - 300px)/3.6)));color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;--ok:#3ddc84;--ko:#ff7b6e;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;--ok:#3ddc84;--ko:#ff7b6e;color-scheme:dark}
 html,body{height:100%;margin:0}
+@supports (height:100dvh){:root{--cw:max(72px,min(29vw,190px,calc((100dvh - 300px)/3.6)))}}
 body{background:var(--bg);color:var(--fg);font:15px system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none}
 header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--pnl);font-size:13px}
 header b{font-size:15px}
@@ -19,14 +20,14 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .evc small{display:block;letter-spacing:.3em;font-size:10px;color:#e6c15a;text-transform:uppercase}.evc b{display:block;font-size:22px;margin:2px 0 4px}.evc div{font-size:13px;line-height:1.3}
 .evc.nuevo{animation:evin .6s}@keyframes evin{from{transform:translateX(-70vw) rotate(-10deg) scale(.6);opacity:0}}
 #mesa{display:flex;gap:10px;width:100%;justify-content:center}
-.zona{flex:1;max-width:230px;min-height:calc(var(--cw)*1.5);border:2px dashed var(--mut);border-radius:12px;display:flex;gap:4px;justify-content:center;align-items:center;position:relative;transition:.2s}
+.zona{flex:1;max-width:calc(var(--cw)*1.8);min-height:calc(var(--cw)*1.8 + 8px);border:2px dashed var(--mut);border-radius:12px;display:flex;gap:4px;justify-content:center;align-items:center;position:relative;transition:.2s}
 .zona small{position:absolute;top:-9px;left:10px;background:var(--bg);padding:0 4px;color:var(--mut);font-size:11px}
 .zona.hover{border-color:var(--acc);background:#2b5fd922}
 #msg b.res{font-size:23px;font-weight:800;display:inline-block;animation:pop2 .35s}@keyframes pop2{from{transform:scale(.7);opacity:0}}
 #msg{text-align:center;min-height:44px;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:14px}
 #mano{display:flex;justify-content:center;gap:8px;padding:8px 6px 10px;min-height:calc(var(--cw)*1.8 + 12px)}
 .card{--w:var(--cw);width:var(--w);height:calc(var(--w)*1.8);font-size:calc(var(--w)/10);border-radius:.9em;color:#222;padding:.5em;box-sizing:border-box;display:flex;flex-direction:column;gap:.25em;position:relative;border:2px solid #1c1c1c;box-shadow:0 0 0 2px #ffffffd0,0 3px 10px #0007;touch-action:none;cursor:grab;transition:transform .25s,opacity .4s;flex:none}
-.mesa .card{--w:calc(var(--cw)*.8);cursor:pointer}
+.mesa .card{--w:var(--cw);cursor:pointer}.mesa.dos .card{--w:calc(var(--cw)*.75)}
 .card.down{background:repeating-linear-gradient(45deg,#7a1f2b,#7a1f2b 6px,#a33a48 6px,#a33a48 12px)!important;}.card.down *{display:none}
 .card .tot{position:absolute;top:.4em;right:.5em;font-weight:700;font-size:1.5em}
 .card .cargo{font-size:.95em;font-weight:600;max-width:70%;line-height:1.1;height:2.2em;flex:none}
@@ -68,7 +69,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 <button id="go">Jugar contra el bot</button><div class="o">— o jugar online —</div>
 <button id="crear">Crear sala</button>
 <label>Código de sala<input id="cod" maxlength="4" placeholder="ABCD" style="text-transform:uppercase"></label><button id="unir">Unirme</button>
-<div id="est"></div><div class="o"><span id="cnt"></span> · <label class="btn" style="display:inline-block">Cargar cartas<input type="file" id="f2" accept=".json,.xlsx" hidden></label></div></div>
+<div id="est"></div><div class="o">Versión del juego: 8 · 19/10/2026</div><div class="o"><span id="cnt"></span> · <label class="btn" style="display:inline-block">Cargar cartas<input type="file" id="f2" accept=".json,.xlsx" hidden></label></div></div>
 <div id="fin"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -351,7 +352,7 @@ function render(){const rk=phase==='revelado'?P.seed+'-'+last.turno:null;
  const t=phase==='revelado'?last.turno+1:P.turno+1;if(phase!=='revelado'){pz=[P.pozos[0].length,P.pozos[1].length];rachaVis=racha.slice()}
  $('#t').textContent=`${t}/${P.eventos.length}`;$('#mz').textContent=P.mazo.length;$('#p0').textContent=pz[0];$('#p1').textContent=pz[1];
  $('#rival').innerHTML='<span style="font-size:11px;color:var(--mut);margin-right:6px">'+esc(N[1])+'</span>'+'<div class="mini"></div>'.repeat(P.manos[1].length);
- const ev=evActual(),k=K(),rel=M.EVENTOS_COMUNES[ev];
+ const ev=evActual(),k=K(),rel=M.EVENTOS_COMUNES[ev];$('#mesa').classList.toggle('dos',k===2);
  const A=a=>a[0].toUpperCase()+a.slice(1),txt=rel?(rel.length>1?'Atributos importantes: '+rel.map(A).join(' y '):'Atributo importante: '+A(rel[0])):'Bajá 2 cartas: suma de todos los atributos (−8 si no comparten ninguna afiliación política)';
  $('#ev').innerHTML=`<div class="evc${evKey!==t?' nuevo':''}"><small>Evento</small><b>${ev}</b><div>${txt}</div></div>`;evKey=t;
  [['n0',N[0]],['n1',N[1]],['zv',N[0]],['zr',N[1]]].forEach(([i,v])=>$('#'+i).textContent=v);
@@ -454,6 +455,6 @@ function deXlsx(buf){const wb=XLSX.read(buf,{type:'array'}),g=n=>XLSX.utils.shee
  return{colores,eventos,cartas}}
 const leer=async e=>{const f=e.target.files[0];try{if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw new Error('No se pudo cargar el lector de Excel (hace falta internet).');cargar(deXlsx(await f.arrayBuffer()))}else cargar(JSON.parse(await f.text()))}catch(x){alert(x.message)}e.target.value=''};
 $('#f').onchange=$('#f2').onchange=leer;
-(async()=>{for(const [n,t] of [['cartas.xlsx','b'],['cartas.json','j']]){let d;try{const r=await fetch(n);if(!r.ok||(t==='b'&&typeof XLSX==='undefined'))continue;d=t==='b'?deXlsx(await r.arrayBuffer()):await r.json()}catch(e){continue}
- try{cargar(d);return}catch(e){alert('Error en '+n+':\n'+e.message);return}}cargar(datosEjemplo())})();
+(async()=>{for(const [n,t] of [['cartas.xlsx','b'],['cartas.json','j']]){let d;try{const r=await fetch(n+'?t='+Date.now(),{cache:'no-store'});if(!r.ok||(t==='b'&&typeof XLSX==='undefined'))continue;d=t==='b'?deXlsx(await r.arrayBuffer()):await r.json()}catch(e){continue}
+ try{cargar(d);$('#cnt').textContent+=' (de '+n+')';return}catch(e){alert('Error en '+n+':\n'+e.message);return}}cargar(datosEjemplo());$('#cnt').textContent+=' (de ejemplo: no se encontró cartas.xlsx ni cartas.json)'})();
 </script></body></html>
