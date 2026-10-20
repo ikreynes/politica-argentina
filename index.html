@@ -30,7 +30,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .card .tot{position:absolute;top:.4em;right:.5em;font-weight:700;font-size:1.5em}
 .card .cargo{font-size:.95em;font-weight:600;max-width:70%;line-height:1.1;height:2.2em;flex:none}
 .foto{flex:1;position:relative;background:#0002;border-radius:.5em;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0}.foto span{font-size:3em;font-weight:700;color:#0004;margin-top:-.4em}
-.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto img{pointer-events:none;-webkit-user-drag:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,#000d 45%);color:#fff;padding:1.2em .3em .35em;text-align:center}.nom{font-weight:700;font-size:1.05em;line-height:1.1}.afs{font-size:.8em;opacity:.85;line-height:1.1;margin-top:.15em}
 .at{display:grid;grid-template-columns:1fr 1fr;gap:.1em .5em;font-size:.85em}.at i{font-style:normal}.at i.rel{background:#ffd54f;border-radius:.3em;font-weight:700}
 .deal{animation:deal .5s backwards;animation-delay:calc(var(--i)*.12s)}
@@ -337,7 +337,7 @@ function cardEl(c,opts={}){const e=document.createElement('div');e.className='ca
  const ev=evActual(),rel=M.EVENTOS_COMUNES[ev]||[];
  if(opts.down){e.classList.add('down');return e}
  e.style.background=D.colores[c.afiliaciones[0]]||'#ddd';
- e.innerHTML=`<div class="tot">${c.total}</div><div class="cargo">${c.cargo}</div><div class="foto"><span>${c.nombre[0]}</span>${c.foto?`<img src="${c.foto}" onerror="this.remove()">`:''}<div class="ov"><div class="nom">${c.nombre}</div><div class="afs">${c.afiliaciones.join(' · ')}</div></div></div><div class="at">${M.ATRIBUTOS.map(a=>`<i class="${rel.includes(a)?'rel':''}">${a.slice(0,3).toUpperCase()} <b>${c[a]}</b></i>`).join('')}</div>`;
+ e.innerHTML=`<div class="tot">${c.total}</div><div class="cargo">${c.cargo}</div><div class="foto"><span>${c.nombre[0]}</span>${c.foto?`<img draggable="false" src="${c.foto}" onerror="this.remove()">`:''}<div class="ov"><div class="nom">${c.nombre}</div><div class="afs">${c.afiliaciones.join(' · ')}</div></div></div><div class="at">${M.ATRIBUTOS.map(a=>`<i class="${rel.includes(a)?'rel':''}">${a.slice(0,3).toUpperCase()} <b>${c[a]}</b></i>`).join('')}</div>`;
  return e}
 let tm=[];const T=(f,ms)=>tm.push(setTimeout(f,ms));
 let revKey=null;
@@ -375,10 +375,11 @@ function pintaRacha(){[['riv',1],['mia',0]].forEach(([z,j])=>{const el=$('#'+z),
 function arrastrable(e,id){
  e.onpointerdown=ev=>{const x0=ev.clientX,y0=ev.clientY;let mv=false;e.setPointerCapture&&e.setPointerCapture(ev.pointerId);e.style.transition='none';e.style.zIndex=50;e.classList.remove('deal');
   const inside=(x,y)=>{const r=$('#mia').getBoundingClientRect();return x>r.left-20&&x<r.right+20&&y>r.top-20&&y<r.bottom+20};
-  e.onpointermove=m=>{const dx=m.clientX-x0,dy=m.clientY-y0;if(Math.abs(dx)+Math.abs(dy)>8)mv=true;e.style.transform=`translate(${dx}px,${dy}px) scale(1.08)`;$('#mia').classList.toggle('hover',inside(m.clientX,m.clientY))};
+  e.onpointermove=m=>{if(m.pointerType==='mouse'&&!(m.buttons&1)){e.onpointercancel();return}const dx=m.clientX-x0,dy=m.clientY-y0;if(Math.abs(dx)+Math.abs(dy)>8)mv=true;e.style.transform=`translate(${dx}px,${dy}px) scale(1.08)`;$('#mia').classList.toggle('hover',inside(m.clientX,m.clientY))};
   e.onpointerup=u=>{e.onpointermove=e.onpointerup=e.onpointercancel=null;$('#mia').classList.remove('hover');
    if(!mv||inside(u.clientX,u.clientY))agregar(id,mv);else{e.style.transition='';e.style.transform='';e.style.zIndex=''}};
-  e.onpointercancel=()=>{e.style.transition='';e.style.transform='';e.style.zIndex=''}}}
+  e.onpointercancel=()=>{e.onpointermove=e.onpointerup=e.onpointercancel=null;$('#mia').classList.remove('hover');e.style.transition='';e.style.transform='';e.style.zIndex=''}}
+ e.ondragstart=ev=>ev.preventDefault()}
 function agregar(id,drop){const k=K();if(sel.length>=k){if(k===1)sel=[];else return}sel.push(id);render()}
 function botElige(){const ev=M.eventoActual(P),h=P.manos[1].map(i=>P.cartas[i]),k=M.cantidadAJugar(ev),rel=M.EVENTOS_COMUNES[ev];
  if(k===1)return[h.map(c=>[rel.reduce((s,a)=>s+c[a],0)+c.total/100+Math.random()*3,c]).sort((a,b)=>b[0]-a[0])[0][1].id];
