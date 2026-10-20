@@ -98,6 +98,9 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
   const RANGO_DE = {}, FORMA_OK = {};
   RANGOS.forEach(r => { RANGO_DE[norm(r)] = r; FORMA_OK[norm(r)] = r; });
   Object.keys(CARGOS_FEM).forEach(f => { RANGO_DE[norm(f)] = CARGOS_FEM[f]; FORMA_OK[norm(f)] = f; });
+  // Abreviaturas aceptadas (para que el cargo entre en una sola línea en la carta)
+  const CARGOS_ABREV = { 'J. de Gabinete': 'Jefe de Gabinete' };
+  Object.keys(CARGOS_ABREV).forEach(f => { RANGO_DE[norm(f)] = CARGOS_ABREV[f]; FORMA_OK[norm(f)] = f; });
   const rangoDe = cargo => RANGO_DE[norm(cargo)]; // devuelve el rango canónico o undefined
 
   const EVENTOS_COMUNES = {
