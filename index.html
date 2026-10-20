@@ -4,8 +4,8 @@
 <title>Política Argentina</title>
 <style>
 :root{--bg:#f4f1ea;--fg:#222;--mut:#6b6b6b;--pnl:#e9e4d8;--acc:#2b5fd9;--ok:#1f8a4c;--ko:#c0392b;--cw:min(28vw,150px,16.5vh);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;--ok:#3ddc84;--ko:#ff7b6e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16181d;--fg:#eee;--mut:#9aa;--pnl:#232733;--acc:#6f9bff;--ok:#3ddc84;--ko:#ff7b6e;color-scheme:dark}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:15px system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none}
 header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--pnl);font-size:13px}
@@ -22,6 +22,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .zona{flex:1;max-width:230px;min-height:calc(var(--cw)*1.5);border:2px dashed var(--mut);border-radius:12px;display:flex;gap:4px;justify-content:center;align-items:center;position:relative;transition:.2s}
 .zona small{position:absolute;top:-9px;left:10px;background:var(--bg);padding:0 4px;color:var(--mut);font-size:11px}
 .zona.hover{border-color:var(--acc);background:#2b5fd922}
+#msg b.res{font-size:23px;font-weight:800;display:inline-block;animation:pop2 .35s}@keyframes pop2{from{transform:scale(.7);opacity:0}}
 #msg{text-align:center;min-height:44px;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:14px}
 #mano{display:flex;justify-content:center;gap:8px;padding:8px 6px 10px;min-height:calc(var(--cw)*1.8 + 12px)}
 .card{--w:var(--cw);width:var(--w);height:calc(var(--w)*1.8);font-size:calc(var(--w)/10);border-radius:.9em;color:#222;padding:.5em;box-sizing:border-box;display:flex;flex-direction:column;gap:.25em;position:relative;border:2px solid #1c1c1c;box-shadow:0 0 0 2px #ffffffd0,0 3px 10px #0007;touch-action:none;cursor:grab;transition:transform .25s,opacity .4s;flex:none}
@@ -39,7 +40,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .fly-up{transform:translateY(-70vh) scale(.5);opacity:0}.fly-down{transform:translateY(70vh) scale(.5);opacity:0}
 .win{outline:3px solid var(--ok)}
 #fin button.sec{background:transparent;border:1px solid #fffa}
-#aviso{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;background:#c0392b;color:#fff;text-align:center;padding:8px;display:none;z-index:200}
+#aviso{background:#c0392b;color:#fff;text-align:center;padding:8px;display:none;font-size:14px}
 #est{min-height:22px;user-select:text;-webkit-user-select:text;font-size:14px;max-width:90vw;word-break:break-all}.code{font-size:34px;letter-spacing:.2em;font-weight:800;display:block}.o{font-size:12px;opacity:.7}
 .zona.enfuego{border:2px solid #ff8c00;box-shadow:0 0 9px #ff8c0066}
 .fuego{position:absolute;top:-20px;right:6px;font-size:28px;line-height:1;transform-origin:50% 90%;text-shadow:0 0 5px #ff8c0066;animation:aparece .4s,flick .45s .4s infinite alternate;z-index:5}
@@ -54,6 +55,7 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 .score{font-size:clamp(34px,10vw,56px);font-weight:800}.sub{opacity:.8;font-size:15px}
 .cf{position:absolute;top:-20px;width:8px;height:14px;animation:caer linear forwards}@keyframes caer{to{transform:translateY(110vh) rotate(720deg)}}
 </style></head><body>
+<div id="aviso"></div>
 <header><span>Turno <b id="t"></b></span><span>Cartas restantes en el mazo: <b id="mz"></b></span><span>Puntaje: <span id="n0"></span> <b id="p0"></b> · <span id="n1"></span> <b id="p1"></b></span>
 <span><label class="btn">JSON<input type="file" id="f" accept=".json,.xlsx" hidden></label> <button id="nv" style="padding:4px 8px;font-size:12px">Nueva</button></span></header>
 <div id="rival"></div>
@@ -67,7 +69,6 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
 <button id="crear">Crear sala</button>
 <label>Código de sala<input id="cod" maxlength="4" placeholder="ABCD" style="text-transform:uppercase"></label><button id="unir">Unirme</button>
 <div id="est"></div><div class="o"><span id="cnt"></span> · <label class="btn" style="display:inline-block">Cargar cartas<input type="file" id="f2" accept=".json,.xlsx" hidden></label></div></div>
-<div id="aviso"></div>
 <div id="fin"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -181,6 +182,9 @@ label.btn{padding:4px 8px;font-size:12px;background:var(--mut)}
     Object.keys(bancoEventos).forEach(t => { for (let i = 0; i < bancoEventos[t]; i++) tarjetas.push(t); });
     const comunes = barajar(tarjetas, rng).slice(0, N);
     const eventos = barajar(comunes.concat(EVENTOS_ELECTORALES), rng);
+    // PASO es la previa: siempre sale antes que las Elecciones Generales (se intercambian si quedaron al revés)
+    const iP = eventos.indexOf('PASO'), iG = eventos.indexOf('Elecciones Generales');
+    if (iG < iP) { eventos[iP] = 'Elecciones Generales'; eventos[iG] = 'PASO'; }
 
     const mazo = barajar(cartas, rng).map(c => c.id);
     const manos = [[], []];
@@ -363,7 +367,7 @@ function render(){const rk=phase==='revelado'?P.seed+'-'+last.turno:null;
   T(()=>rc.forEach(([e,id])=>{const n=cardEl(P.cartas[id]);n.classList.add('pop');e.replaceWith(n);if(last.resultado.ganador===1)n.classList.add('win')}),600);
   if(last.resultado.ganador===0)mia.querySelectorAll('.card').forEach(x=>x.classList.add('win'));
   T(()=>{const r=last.resultado,g=r.ganador;rachaVis=racha.slice();pintaRacha();
-   msg.innerHTML=`<div><b style="color:${g===0?'var(--ok)':g===1?'var(--ko)':'var(--mut)'}">${g===0?'¡Ganaste el turno!':g===1?'Perdiste el turno':'Empate: cada uno se lleva lo suyo'}</b><br><span style="color:var(--mut);font-size:12px">${r.puntajes[0]} vs ${r.puntajes[1]} · definió: ${r.motivo}</span></div>`;
+   msg.innerHTML=`<div><b class="res" style="color:${g===0?'var(--ok)':g===1?'var(--ko)':'var(--mut)'}">${g===0?'¡Ganaste el turno!':g===1?'Perdiste el turno':'Empate: cada uno se lleva lo suyo'}</b><br><span style="color:var(--mut);font-size:13px">${r.puntajes[0]} vs ${r.puntajes[1]} · definió: ${r.motivo}</span></div>`;
    const b=document.createElement('button');b.textContent=P.terminada?'Ver resultado':'Siguiente';b.onclick=siguiente;msg.append(b)},1100);
  }
  const mano=$('#mano');mano.innerHTML='';
@@ -402,7 +406,7 @@ function otra(){if(modo==='bot')return nueva();rv[0]=true;enviar({t:modo==='invi
 function salir(){enviar({t:'salir'});setTimeout(()=>{try{peer&&peer.destroy()}catch(e){}location.href=location.href.split('?')[0]},150)}
 try{$('#nom').value=localStorage.getItem('nombre')||''}catch(e){}
 const yoJugue=()=>modo==='invitado'?yjG:!!P.jugadas[0],rivJugo=()=>modo==='invitado'?rjG:!!P.jugadas[1];
-const est=t=>{$('#est').innerHTML=t},aviso=t=>{const a=$('#aviso');a.textContent=t;a.style.display='block';setTimeout(()=>a.style.display='none',6000)},enviar=m=>{if(conn&&conn.open)conn.send(m)};
+const est=t=>{$('#est').innerHTML=t},aviso=(t,fijo)=>{const a=$('#aviso');a.textContent=t;a.style.display='block';clearTimeout(window.avT);if(!fijo)window.avT=setTimeout(()=>a.style.display='none',6000)},quitaAviso=()=>{clearTimeout(window.avT);$('#aviso').style.display='none'},enviar=m=>{if(conn&&conn.open)conn.send(m)};
 function sincro(){if(modo==='anfitrion'&&emp)enviar({t:'snap',s:snap(1)})}
 function snap(j){const o=1-j,sw=a=>j===0?a:[a[1],a[0]],z=n=>Array(n).fill(0),ids=new Set(P.manos[j]);let l=null;
  if(last){const g=last.resultado.ganador,r=last.resultado;l={turno:last.turno,evento:last.evento,jugadas:sw(last.jugadas),resultado:{ganador:g===null?null:(g===j?0:1),puntajes:sw(r.puntajes),motivo:r.motivo}};l.jugadas.flat().forEach(i=>ids.add(i))}
@@ -421,7 +425,7 @@ function confirmar(){if(sel.length!==K())return;const ids=sel.slice();
  if(r.esperando){phase='espera';render();sincro()}else resuelto(r.resultado)}
 function empezar(){emp=true;if(modo==='anfitrion')$('#nv').textContent='Salir';$('#ini').style.display='none';nueva()}
 const nombre=()=>$('#nom').value.trim()||'Jugador',guarda=()=>{try{localStorage.setItem('nombre',nombre())}catch(e){}};
-function deInvitado(m){if(m.t==='hola'){N[1]=String(m.nombre||'Rival').slice(0,16);if(emp){render();sincro()}else empezar()}
+function deInvitado(m){if(m.t==='hola'){quitaAviso();N[1]=String(m.nombre||'Rival').slice(0,16);if(emp){render();sincro()}else empezar()}
  else if(m.t==='jugada'&&emp){let r;try{r=M.jugar(P,1,m.ids)}catch(e){return}if(r.esperando){render();sincro()}else resuelto(r.resultado)}
  else if(m.t==='revancha'&&emp){rv[1]=true;if(rv[0])nueva();else repinta()}
  else if(m.t==='salir'){salio=true;pintaFin()}}
@@ -429,12 +433,15 @@ function crearSala(){if(typeof Peer==='undefined')return est('No se pudo cargar 
  const c=Math.random().toString(36).slice(2,6).toUpperCase();if(peer)peer.destroy();peer=new Peer('pa-'+c);
  peer.on('open',()=>est('Código de sala:<b class="code">'+c+'</b>Esperando al rival…<br>Enlace: '+location.href.split('?')[0]+'?sala='+c));
  peer.on('error',e=>{if(e.type==='unavailable-id')crearSala();else est('Error de conexión: '+e.type)});
- peer.on('connection',cn=>{conn=cn;cn.on('data',deInvitado);cn.on('close',()=>!salio&&aviso(N[1]+' se desconectó. Puede volver a entrar con el mismo código.'))})}
+ peer.on('connection',cn=>{conn=cn;cn.on('data',deInvitado);cn.on('close',()=>!salio&&cn===conn&&aviso(N[1]+' se desconectó. Esperando que vuelva…',true))})}
+function enlaza(cn,c){cn.on('data',m=>{if(m.t==='snap'){quitaAviso();$('#ini').style.display='none';recibe(m.s)}else if(m.t==='rv'){rv[1]=true;repinta()}else if(m.t==='salir'){salio=true;pintaFin()}});
+ cn.on('close',()=>{if(salio||cn!==conn)return;aviso('Se perdió la conexión con '+N[1]+'. Reconectando…',true);reintenta(c)})}
+function reintenta(c){if(salio||(conn&&conn.open))return;try{if(peer.disconnected)peer.reconnect();const cn=peer.connect('pa-'+c,{reliable:true});cn.on('open',()=>{conn=cn;enlaza(cn,c);cn.send({t:'hola',nombre:N[0]})})}catch(e){}setTimeout(()=>reintenta(c),4000)}
 function unirse(){if(typeof Peer==='undefined')return est('No se pudo cargar PeerJS (hace falta internet).');
  const c=$('#cod').value.trim().toUpperCase();if(c.length<4)return est('Escribí el código de 4 letras.');
  est('Conectando…');peer=new Peer();peer.on('error',e=>est('No se pudo conectar: '+e.type+(e.type==='peer-unavailable'?' (revisá el código)':'')));
  peer.on('open',()=>{conn=peer.connect('pa-'+c,{reliable:true});conn.on('open',()=>{modo='invitado';$('#nv').textContent='Salir';conn.send({t:'hola',nombre:nombre()});est('Conectado. Esperando que empiece…')});
-  conn.on('data',m=>{if(m.t==='snap'){$('#ini').style.display='none';recibe(m.s)}else if(m.t==='rv'){rv[1]=true;repinta()}else if(m.t==='salir'){salio=true;pintaFin()}});conn.on('close',()=>!salio&&aviso('Se perdió la conexión con '+N[1]+'. Recargá la página y entrá de nuevo con el código.'))})}
+  enlaza(conn,c)})}
 $('#go').onclick=()=>{modo='bot';N=[nombre(),'Bot'];guarda();empezar()};
 $('#crear').onclick=()=>{modo='anfitrion';N=[nombre(),'Rival'];guarda();crearSala()};
 $('#unir').onclick=()=>{guarda();unirse()};
